@@ -9,14 +9,4 @@ import org.neo4j.tutorial.AwesomenessRatingEngine;
 public class AwesomenessServerPlugin extends ServerPlugin
 {
     // YOUR CODE GOES HERE
-    // SNIPPET_START
-
-    @PluginTarget(Node.class)
-    public double awesomeness(@Source Node node)
-    {
-        AwesomenessRatingEngine ratingEngine = new AwesomenessRatingEngine();
-        return ratingEngine.rateAwesomeness(node.getGraphDatabase(), node.getId());
-    }
-
-    // SNIPPET_END
 }

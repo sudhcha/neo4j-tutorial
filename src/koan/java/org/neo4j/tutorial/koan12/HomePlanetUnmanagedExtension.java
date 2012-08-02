@@ -15,32 +15,4 @@ import org.neo4j.graphdb.GraphDatabaseService;
 public class HomePlanetUnmanagedExtension
 {
     // YOUR CODE GOES HERE
-    // SNIPPET_START
-
-    @GET
-    @Path("/homeplanet")
-    public String findHomePlanetFor(@PathParam("character") String character, @Context GraphDatabaseService db)
-    {
-        ExecutionEngine engine = new ExecutionEngine(db);
-        String cql = null;
-
-        cql = "start char = node:characters(character = '" + character + "')"
-                + "match (char)-[:COMES_FROM]->(planet)"
-                + "return planet.planet";
-
-        ExecutionResult result = engine.execute(cql);
-        String planet = (String) result.javaColumnAs("planet.planet").next();
-
-        if (planet != null)
-        {
-            return planet;
-        }
-        else
-        {
-            throw new NotFoundException(
-                    String.format("The specified character [%s] was not found in the database", character));
-        }
-    }
-
-    // SNIPPET_END
 }

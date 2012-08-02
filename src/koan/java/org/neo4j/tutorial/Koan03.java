@@ -39,13 +39,6 @@ public class Koan03
         Index<Node> characters = null;
 
         // YOUR CODE GOES HERE
-        // SNIPPET_START
-
-        characters = universe.getDatabase()
-                             .index()
-                             .forNodes("characters");
-
-        // SNIPPET_END
 
         assertNotNull(characters);
         assertThat(
@@ -66,22 +59,6 @@ public class Koan03
                      .getSingle());
 
         // YOUR CODE GOES HERE
-        // SNIPPET_START
-
-        Transaction transaction = db.beginTx();
-        try
-        {
-            db.index()
-              .forNodes("characters")
-              .add(abigailPettigrew, "character", abigailPettigrew.getProperty("character"));
-            transaction.success();
-        }
-        finally
-        {
-            transaction.finish();
-        }
-
-        // SNIPPET_END
 
         assertNotNull(db.index()
                         .forNodes("characters")
@@ -95,14 +72,6 @@ public class Koan03
         IndexHits<Node> species = null;
 
         // YOUR CODE GOES HERE
-        // SNIPPET_START
-
-        species = universe.getDatabase()
-                          .index()
-                          .forNodes("species")
-                          .query("species", "S*n");
-
-        // SNIPPET_END
 
         assertThat(species, containsOnlySpecies("Silurian", "Slitheen", "Sontaran", "Skarasen"));
     }
@@ -119,24 +88,6 @@ public class Koan03
         Node cyberleader = retriveCyberleaderFromIndex(db);
 
         // YOUR CODE GOES HERE
-        // SNIPPET_START
-
-        Transaction tx = db.beginTx();
-        try
-        {
-            for (Relationship rel : cyberleader.getRelationships())
-            {
-                rel.delete();
-            }
-            cyberleader.delete();
-            tx.success();
-        }
-        finally
-        {
-            tx.finish();
-        }
-
-        // SNIPPET_END
 
         assertNull("Cyberleader has not been deleted from the characters index.", retriveCyberleaderFromIndex(db));
 
