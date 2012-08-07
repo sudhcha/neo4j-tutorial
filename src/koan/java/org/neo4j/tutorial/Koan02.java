@@ -40,7 +40,15 @@ public class Koan02
     {
         Node node = null;
 
-        // YOUR CODE GOES HERE
+        Transaction tx = db.beginTx();
+        try{
+        	node = db.createNode();
+        	tx.success();
+        } catch(Exception e){
+        	tx.failure();
+        } finally {
+        	tx.finish();
+        }
 
         assertTrue(databaseHelper.nodeExistsInDatabase(node));
     }
@@ -50,7 +58,17 @@ public class Koan02
     {
         Node theDoctor = null;
 
-        // YOUR CODE GOES HERE
+        Transaction tx = db.beginTx();
+        try{
+        	theDoctor = db.createNode();
+        	theDoctor.setProperty("firstname", "William");
+        	theDoctor.setProperty("lastname", "Hartnell");
+        	tx.success();
+        } catch(Exception e){
+        	tx.failure();
+        } finally {
+        	tx.finish();
+        }
 
         assertTrue(databaseHelper.nodeExistsInDatabase(theDoctor));
 
@@ -66,7 +84,17 @@ public class Koan02
         Node susan = null;
         Relationship companionRelationship = null;
 
-        // YOUR CODE GOES HERE
+        Transaction tx = db.beginTx();
+        try{
+        	theDoctor = db.createNode();
+        	susan = db.createNode();
+        	companionRelationship = susan.createRelationshipTo(theDoctor, DoctorWhoRelationships.COMPANION_OF);
+        	tx.success();
+        } catch(Exception e){
+        	tx.failure();
+        } finally {
+        	tx.finish();
+        }
 
         Relationship storedCompanionRelationship = db.getRelationshipById(companionRelationship.getId());
         assertNotNull(storedCompanionRelationship);
@@ -80,7 +108,19 @@ public class Koan02
         /* Captain Kirk has no business being in our database, so set phasers to kill */
         Node captainKirk = createPollutedDatabaseContainingStarTrekReferences();
 
-        // YOUR CODE GOES HERE
+        Transaction tx = db.beginTx();
+        try{
+        	Iterable<Relationship> rels = captainKirk.getRelationships();
+        	for (Relationship r : rels){
+        		r.delete();
+        	}
+        	captainKirk.delete();
+        	tx.success();
+        } catch(Exception e){
+        	tx.failure();
+        } finally {
+        	tx.finish();
+        }
 
         try
         {
@@ -99,7 +139,20 @@ public class Koan02
     {
         Node susan = createInaccurateDatabaseWhereSusanIsEnemyOfTheDoctor();
 
-        // YOUR CODE GOES HERE
+        Transaction tx = db.beginTx();
+        try{
+        	Iterable<Relationship> rels = susan.getRelationships();
+        	for (Relationship r : rels){
+        		if (r.isType(DoctorWhoRelationships.ENEMY_OF)){
+        			r.delete();
+        		}
+        	}
+        	tx.success();
+        } catch(Exception e){
+        	tx.failure();
+        } finally {
+        	tx.finish();
+        }
         assertEquals(1, databaseHelper.destructivelyCountRelationships(susan.getRelationships()));
     }
 
