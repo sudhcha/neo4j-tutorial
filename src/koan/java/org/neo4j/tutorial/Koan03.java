@@ -7,6 +7,8 @@ import org.neo4j.graphdb.*;
 import org.neo4j.graphdb.index.Index;
 import org.neo4j.graphdb.index.IndexHits;
 
+import com.mongodb.DB;
+
 import static org.junit.Assert.*;
 import static org.neo4j.tutorial.matchers.ContainsOnlySpecificSpecies.containsOnlySpecies;
 import static org.neo4j.tutorial.matchers.ContainsSpecificCompanions.contains;
@@ -38,7 +40,7 @@ public class Koan03
     {
         Index<Node> characters = null;
 
-        // YOUR CODE GOES HERE
+        characters = universe.getDatabase().index().forNodes("characters");
 
         assertNotNull(characters);
         assertThat(
@@ -57,8 +59,17 @@ public class Koan03
                      .forNodes("characters")
                      .get("character", "Abigail Pettigrew")
                      .getSingle());
-
-        // YOUR CODE GOES HERE
+        Transaction tx = db.beginTx();
+        try{
+        	db.index().forNodes("characters")
+            .add(abigailPettigrew, "character", abigailPettigrew.getProperty("character"));
+        	tx.success();
+        } catch (Exception e){
+        	tx.failure();
+        } finally{
+        	tx.finish();
+        }
+        
 
         assertNotNull(db.index()
                         .forNodes("characters")
@@ -71,7 +82,8 @@ public class Koan03
     {
         IndexHits<Node> species = null;
 
-        // YOUR CODE GOES HERE
+        species =universe.getDatabase().index()
+        			.forNodes("species").query("species","S*n");
 
         assertThat(species, containsOnlySpecies("Silurian", "Slitheen", "Sontaran", "Skarasen"));
     }
@@ -87,7 +99,19 @@ public class Koan03
         GraphDatabaseService db = universe.getDatabase();
         Node cyberleader = retriveCyberleaderFromIndex(db);
 
-        // YOUR CODE GOES HERE
+        Transaction tx = db.beginTx();
+        try{
+	        Iterable<Relationship> rels = cyberleader.getRelationships();
+	        for (Relationship r: rels){
+	        	r.delete();
+	        }
+	        cyberleader.delete();
+	        tx.success();
+        } catch (Exception e){
+        	tx.failure();
+        } finally {
+        	tx.finish();
+        }
 
         assertNull("Cyberleader has not been deleted from the characters index.", retriveCyberleaderFromIndex(db));
 
